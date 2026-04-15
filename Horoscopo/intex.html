@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Horoscopo</title>
+
+  <!-- Bulma: libreria de estilos -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+
+  <!-- p5.js: libreria principal del curso -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+
+  <style>
+    body {
+      background-color: #0d1f0f;
+      color: white;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+
+    .mi-titulo {
+      color: #4caf50;
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 6px;
+    }
+
+    .mi-subtitulo {
+      color: #81c784;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+    }
+
+    .caja-verde {
+      background-color: #0a2e0c;
+      border: 1px solid #2e5e30;
+      border-radius: 12px;
+      padding: 25px;
+    }
+
+    .fila-fecha {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .bloque-selector {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .etiqueta-selector {
+      font-size: 0.7rem;
+      color: #81c784;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .mi-select {
+      background-color: #112913;
+      border: 1px solid #4caf50;
+      border-radius: 8px;
+      color: white;
+      padding: 10px 8px;
+      font-size: 0.95rem;
+      width: 100%;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234caf50' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 30px;
+    }
+
+    .mi-select:focus {
+      border-color: #81c784;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    }
+
+    .mi-boton {
+      background-color: transparent;
+      border: 2px solid #4caf50;
+      border-radius: 8px;
+      color: #4caf50;
+      padding: 10px;
+      width: 100%;
+      font-size: 1rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    .mi-boton:hover {
+      background-color: #4caf50;
+      color: #0d1f0f;
+      font-weight: bold;
+    }
+
+    .fila-signo {
+      background-color: #0a2e0c;
+      border: 1px solid #2e5e30;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fila-signo:hover  { border-color: #4caf50; background-color: #112913; }
+    .fila-signo.activo { border-color: #4caf50; background-color: #112913; }
+
+    .etiqueta {
+      display: inline-block;
+      border: 1px solid #4caf50;
+      color: #4caf50;
+      border-radius: 20px;
+      padding: 3px 12px;
+      margin: 4px;
+      font-size: 0.8rem;
+    }
+
+    #resultado { display: none; }
+  </style>
+</head>
+<body>
+
+  <p class="mi-titulo">&#127807; Horoscopo Gomelo &#127807;</p>
+  <p class="mi-subtitulo">&#10022; descubre lo que los astros dicen sobre ti &#10022;</p>
+
+  <!-- SECCION 1: Fecha de nacimiento -->
+  <div class="columns is-centered">
+    <div class="column is-5">
+      <div class="caja-verde">
+
+        <p class="title is-6" style="color:#81c784; margin-bottom:16px">
+          &#128197; ¿Cuando naciste?
+        </p>
+
+        <div class="fila-fecha">
+          <div class="bloque-selector">
+            <span class="etiqueta-selector">Dia</span>
+            <select id="sel-dia" class="mi-select">
+              <option value="">--</option>
+            </select>
+          </div>
+
+          <div class="bloque-selector">
+            <span class="etiqueta-selector">Mes</span>
+            <select id="sel-mes" class="mi-select">
+              <option value="">--</option>
+              <option value="1">Enero</option>
+              <option value="2">Febrero</option>
+              <option value="3">Marzo</option>
+              <option value="4">Abril</option>
+              <option value="5">Mayo</option>
+              <option value="6">Junio</option>
+              <option value="7">Julio</option>
+              <option value="8">Agosto</option>
+              <option value="9">Septiembre</option>
+              <option value="10">Octubre</option>
+              <option value="11">Noviembre</option>
+              <option value="12">Diciembre</option>
+            </select>
+          </div>
+
+          <div class="bloque-selector">
+            <span class="etiqueta-selector">Ano</span>
+            <select id="sel-ano" class="mi-select">
+              <option value="">----</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="mi-boton" onclick="detectarSigno()">
+          &#10022; Descubrir mi signo &#10022;
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCION 2: Lista de signos -->
+  <div class="columns is-centered">
+    <div class="column is-5">
+      <p class="title is-6" style="color:#81c784; margin-bottom:10px">
+        O elijalo sumerce
+      </p>
+      <div id="listaSignos"></div>
+    </div>
+  </div>
+
+  <!-- SECCION 3: Panel de resultado -->
+  <div class="columns is-centered">
+    <div class="column is-5">
+      <div id="resultado" class="caja-verde">
+
+        <p id="res-emoji"    class="has-text-centered" style="font-size:3.5rem; margin-bottom:6px"></p>
+        <p id="res-nombre"   class="title is-3 has-text-centered" style="color:#4caf50; margin-bottom:4px"></p>
+        <p id="res-elemento" class="has-text-centered" style="color:#81c784; font-size:0.85rem; margin-bottom:14px"></p>
+
+        <hr style="background-color:#2e5e30;" />
+
+        <p id="desc1" style="text-align:left;   color:#ccc;    margin-bottom:10px"></p>
+        <p id="desc2" style="text-align:center; color:#4caf50; font-weight:bold; margin-bottom:10px"></p>
+        <p id="desc3" style="text-align:right;  color:#81c784; font-style:italic"></p>
+
+        <div id="palabras" class="has-text-centered" style="margin-top:14px"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center; color:#2e5e30; margin-top:30px; font-size:0.75rem">
+    Los astros hablan, tu decides.
+  </p>
+
+
+  <script>
+
+    // ============================================================
+    // ARREGLO DE SIGNOS
+    // En p5.js los arreglos y objetos funcionan igual que aqui.
+    // Cada signo es un objeto con sus propiedades.
+    // ============================================================
+    var signos = [
+      { emoji:"\u2648", nombre:"Aries",      fechas:"21 Mar - 19 Abr", elemento:"Fuego - Marte",     palabras:["Valiente","Lider","Impulsivo"],     desc1:"Aries llega con energia arrolladora. Su confianza es dificil de ignorar.",         desc2:"Naciste para iniciar, no para esperar.",                 desc3:"Cuando te propones algo, nada te detiene."            },
+      { emoji:"\u2649", nombre:"Tauro",       fechas:"20 Abr - 20 May", elemento:"Tierra - Venus",    palabras:["Leal","Paciente","Estable"],         desc1:"Tauro construye su mundo con calma y determinacion, paso a paso.",                 desc2:"Tu paciencia es tu mayor fortaleza.",                    desc3:"Eres el ancla que todos necesitan."                   },
+      { emoji:"\u264a", nombre:"Geminis",     fechas:"21 May - 20 Jun", elemento:"Aire - Mercurio",   palabras:["Curioso","Ingenioso","Adaptable"],   desc1:"La mente de Geminis nunca descansa. Siempre hay algo nuevo por aprender.",        desc2:"Tu curiosidad te lleva a lugares increibles.",           desc3:"Dos almas en un cuerpo, ambas extraordinarias."       },
+      { emoji:"\u264b", nombre:"Cancer",      fechas:"21 Jun - 22 Jul", elemento:"Agua - Luna",       palabras:["Empatico","Intuitivo","Leal"],       desc1:"Cancer siente el mundo con una profundidad que pocos entienden.",                 desc2:"Tu corazon es un refugio para quienes mas lo necesitan.", desc3:"Tu sensibilidad es tu mayor fortaleza."              },
+      { emoji:"\u264c", nombre:"Leo",         fechas:"23 Jul - 22 Ago", elemento:"Fuego - Sol",       palabras:["Carismatico","Generoso","Creativo"], desc1:"Leo nacio para brillar e iluminar a quienes lo rodean.",                          desc2:"Tu generosidad no tiene limites.",                       desc3:"El mundo es tu escenario."                           },
+      { emoji:"\u264d", nombre:"Virgo",       fechas:"23 Ago - 22 Sep", elemento:"Tierra - Mercurio", palabras:["Analitico","Detallista","Practico"], desc1:"Virgo ve lo que los demas pasan por alto con una precision admirable.",           desc2:"Ayudar a los demas es tu vocacion.",                     desc3:"La perfeccion que buscas te hace crecer."            },
+      { emoji:"\u264e", nombre:"Libra",       fechas:"23 Sep - 22 Oct", elemento:"Aire - Venus",      palabras:["Justo","Armonioso","Social"],        desc1:"Libra busca el equilibrio en todas sus relaciones y decisiones.",                 desc2:"Ves la belleza en todo lo que te rodea.",                desc3:"Tiendes puentes donde otros levantan muros."          },
+      { emoji:"\u264f", nombre:"Escorpio",    fechas:"23 Oct - 21 Nov", elemento:"Agua - Pluton",     palabras:["Intenso","Resiliente","Perceptivo"], desc1:"Escorpio va siempre a las profundidades de todo lo que toca.",                   desc2:"Tu intensidad es exactamente tu magia.",                 desc3:"Siempre resurges mas fuerte."                         },
+      { emoji:"\u2650", nombre:"Sagitario",   fechas:"22 Nov - 21 Dic", elemento:"Fuego - Jupiter",   palabras:["Aventurero","Libre","Optimista"],    desc1:"Sagitario siempre busca nuevos horizontes con una gran sonrisa.",                desc2:"Tu honestidad es un regalo que pocos se atreven a dar.", desc3:"La libertad es tu forma de respirar."                },
+      { emoji:"\u2651", nombre:"Capricornio", fechas:"22 Dic - 19 Ene", elemento:"Tierra - Saturno",  palabras:["Ambicioso","Disciplinado","Maduro"], desc1:"Capricornio sabe que el esfuerzo siempre vale la pena al final.",                desc2:"Piensas en el futuro cuando otros solo ven el hoy.",     desc3:"Eres el arquitecto de tu propio destino."            },
+      { emoji:"\u2652", nombre:"Acuario",     fechas:"20 Ene - 18 Feb", elemento:"Aire - Urano",      palabras:["Visionario","Original","Innovador"], desc1:"Acuario ve el futuro antes que los demas. Su mente es unica.",                   desc2:"Luchas siempre por causas mas grandes que tu mismo.",    desc3:"El mundo te necesita exactamente como eres."         },
+      { emoji:"\u2653", nombre:"Piscis",      fechas:"19 Feb - 20 Mar", elemento:"Agua - Neptuno",    palabras:["Sonador","Empatico","Artistico"],    desc1:"Piscis vive entre el mundo real y el que imagina con su creatividad.",           desc2:"Tu sensibilidad es tu superpoder.",                      desc3:"Siempre llegas al corazon de las personas."          }
+    ];
+
+
+    // ============================================================
+    // SETUP de p5.js
+    // En p5.js, setup() se ejecuta UNA SOLA VEZ al cargar la pagina.
+    // Aqui hacemos todo lo que necesitamos preparar al inicio.
+    // ============================================================
+    function setup() {
+
+      // p5.js no necesita canvas si solo usamos HTML,
+      // pero igual llamamos noCanvas() para decirle que no lo cree
+      noCanvas();
+
+      // PASO 1: Llenar el selector de dias usando un for de p5.js
+      var selectDia = select("#sel-dia"); // select() busca un elemento HTML por su id
+
+      for (var d = 1; d <= 31; d++) {
+        selectDia.elt.innerHTML += '<option value="' + d + '">' + d + '</option>';
+      }
+
+      // PASO 2: Llenar el selector de anos
+      var selectAno = select("#sel-ano");
+      var anoActual = year(); // year() es una funcion de p5.js que da el ano actual
+
+      for (var a = anoActual; a >= anoActual - 100; a--) {
+        selectAno.elt.innerHTML += '<option value="' + a + '">' + a + '</option>';
+      }
+
+      // PASO 3: Crear los botones de la lista de signos
+      var lista = select("#listaSignos"); // seleccionamos el contenedor
+
+      for (var i = 0; i < signos.length; i++) {
+        var s = signos[i]; // tomamos el signo en la posicion i
+
+        // createElement() de p5.js crea una etiqueta HTML
+        var fila = createElement("div");
+        fila.class("fila-signo");
+        fila.attribute("data-indice", i);
+
+        fila.elt.innerHTML =
+          '<span style="font-size:1.6rem">' + s.emoji + '</span>' +
+          '<div>' +
+            '<strong style="color:#4caf50">' + s.nombre + '</strong>' +
+            '<br>' +
+            '<small style="color:#81c784">' + s.fechas + '</small>' +
+          '</div>';
+
+        // mousePressed() de p5.js equivale al onclick
+        (function(indice) {
+          fila.mousePressed(function() {
+            mostrarSigno(indice);
+          });
+        })(i);
+
+        fila.parent(lista); // parent() agrega el elemento dentro del contenedor
+      }
+    }
+
+
+    // ============================================================
+    // FUNCION detectarSigno()
+    // Lee los tres selectores y busca el signo con if / else if
+    // ============================================================
+    function detectarSigno() {
+
+      var dia = int(select("#sel-dia").value()); // int() convierte texto a numero (p5.js)
+      var mes = int(select("#sel-mes").value());
+      var ano = int(select("#sel-ano").value());
+
+      if (!dia || !mes || !ano) {
+        alert("Por favor elige el dia, mes y ano de tu nacimiento.");
+        return;
+      }
+
+      var indiceEncontrado = -1;
+
+      if      (mes == 3  && dia >= 21 || mes == 4  && dia <= 19) { indiceEncontrado = 0;  } // Aries
+      else if (mes == 4  && dia >= 20 || mes == 5  && dia <= 20) { indiceEncontrado = 1;  } // Tauro
+      else if (mes == 5  && dia >= 21 || mes == 6  && dia <= 20) { indiceEncontrado = 2;  } // Geminis
+      else if (mes == 6  && dia >= 21 || mes == 7  && dia <= 22) { indiceEncontrado = 3;  } // Cancer
+      else if (mes == 7  && dia >= 23 || mes == 8  && dia <= 22) { indiceEncontrado = 4;  } // Leo
+      else if (mes == 8  && dia >= 23 || mes == 9  && dia <= 22) { indiceEncontrado = 5;  } // Virgo
+      else if (mes == 9  && dia >= 23 || mes == 10 && dia <= 22) { indiceEncontrado = 6;  } // Libra
+      else if (mes == 10 && dia >= 23 || mes == 11 && dia <= 21) { indiceEncontrado = 7;  } // Escorpio
+      else if (mes == 11 && dia >= 22 || mes == 12 && dia <= 21) { indiceEncontrado = 8;  } // Sagitario
+      else if (mes == 12 && dia >= 22 || mes == 1  && dia <= 19) { indiceEncontrado = 9;  } // Capricornio
+      else if (mes == 1  && dia >= 20 || mes == 2  && dia <= 18) { indiceEncontrado = 10; } // Acuario
+      else if (mes == 2  && dia >= 19 || mes == 3  && dia <= 20) { indiceEncontrado = 11; } // Piscis
+
+      if (indiceEncontrado == -1) {
+        alert("No se pudo detectar el signo. Revisa la fecha.");
+        return;
+      }
+
+      mostrarSigno(indiceEncontrado);
+    }
+
+
+    // ============================================================
+    // FUNCION mostrarSigno(indice)
+    // Recibe el numero del signo y llena el panel con sus datos
+    // ============================================================
+    function mostrarSigno(indice) {
+
+      var s = signos[indice];
+
+      // Quitamos la clase activo de todos los botones
+      var todasLasFilas = selectAll(".fila-signo"); // selectAll() selecciona varios elementos (p5.js)
+
+      for (var i = 0; i < todasLasFilas.length; i++) {
+        todasLasFilas[i].removeClass("activo");
+      }
+
+      // Marcamos solo el signo elegido
+      todasLasFilas[indice].addClass("activo");
+
+      // Colocamos los datos en el panel usando select() de p5.js
+      select("#res-emoji").elt.textContent    = s.emoji;
+      select("#res-nombre").elt.textContent   = s.nombre;
+      select("#res-elemento").elt.textContent = s.elemento;
+      select("#desc1").elt.textContent        = s.desc1;
+      select("#desc2").elt.textContent        = s.desc2;
+      select("#desc3").elt.textContent        = s.desc3;
+
+      // Creamos las etiquetas de palabras clave
+      var contenedor = select("#palabras");
+      contenedor.elt.innerHTML = "";
+
+      for (var j = 0; j < s.palabras.length; j++) {
+        var etiq = createElement("span", s.palabras[j]); // createElement(tag, texto)
+        etiq.class("etiqueta");
+        etiq.parent(contenedor);
+      }
+
+      // Mostramos el panel de resultado
+      select("#resultado").style("display", "block"); // style() cambia el CSS (p5.js)
+
+      // Bajamos la pagina hasta el resultado
+      select("#resultado").elt.scrollIntoView({ behavior: "smooth" });
+    }
+
+  </script>
+
+</body>
+</html>
